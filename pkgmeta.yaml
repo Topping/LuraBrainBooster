@@ -1,0 +1,7 @@
+package-as: LuraBrainBooster
+
+ignore:
+  - AGENTS.md
+  - docs
+  - internal-docs
+  - README.md
