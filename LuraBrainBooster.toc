@@ -1,0 +1,13 @@
+## Interface: 120005
+## Title: L'ura Brain Booster
+## Notes: Midnight Falls / L'ura Death's Dirge memory helper.
+## Author: Nikolai & Codex
+## Version: 0.4.2
+## SavedVariables: LuraBrainBoosterDB
+
+Constants.lua
+Strategies.lua
+Strategy_Ping.lua
+Core.lua
+UI.lua
+Slash.lua
