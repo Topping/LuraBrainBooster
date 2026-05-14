@@ -31,6 +31,51 @@ function LL:GetSlotCount()
     return self:GetMode().slots
 end
 
+local function FormatScalePercent(scale)
+    return tostring(math.floor((scale or 1) * 100 + 0.5))
+end
+
+function LL:GetUIScale()
+    local scale = self.db and self.db.uiScale
+
+    if type(scale) == "number"
+        and scale >= (self.MIN_UI_SCALE or 0.5)
+        and scale <= (self.MAX_UI_SCALE or 1.25) then
+        return scale
+    end
+
+    return self.DEFAULT_UI_SCALE or 1.0
+end
+
+function LL:ApplyUIScale()
+    if self.viewerFrame then
+        self.viewerFrame:SetScale(self:GetUIScale())
+    end
+end
+
+function LL:PrintUIScale()
+    local minPercent = FormatScalePercent(self.MIN_UI_SCALE or 0.5)
+    local maxPercent = FormatScalePercent(self.MAX_UI_SCALE or 1.25)
+
+    self:Print("Viewer scale is " .. FormatScalePercent(self:GetUIScale()) .. "%. Use /ll scale " .. minPercent .. "-" .. maxPercent .. ", or /ll scale reset.")
+end
+
+function LL:SetUIScalePercent(percent)
+    local minScale = self.MIN_UI_SCALE or 0.5
+    local maxScale = self.MAX_UI_SCALE or 1.25
+    local minPercent = minScale * 100
+    local maxPercent = maxScale * 100
+
+    if type(percent) ~= "number" or percent < minPercent or percent > maxPercent then
+        self:Print("Invalid scale. Use a number from " .. FormatScalePercent(minScale) .. " to " .. FormatScalePercent(maxScale) .. ", or /ll scale reset.")
+        return
+    end
+
+    self.db.uiScale = percent / 100
+    self:ApplyUIScale()
+    self:Print("Viewer scale set to " .. FormatScalePercent(self.db.uiScale) .. "%.")
+end
+
 function LL:GetChannel()
     local channel = self.db and self.db.channel or "raid"
     return self.CHANNELS[channel] or self.CHANNELS.raid

@@ -23,6 +23,8 @@ incoming authorized macro payloads in a fixed order display.
   or a raid assistant.
 - `/ll undo` removes the most recent local symbol.
 - `/ll mode normal|heroic|mythic` sets sequence length.
+- `/ll scale 50-125` sets the viewer scale percentage.
+- `/ll scale reset` resets the viewer scale to 100%.
 - `/ll channel raid|instance|party` changes the direct macro channel.
 - `/ll strategy` shows the selected transmit strategy and available options.
 - `/ll strategy texture` selects the default direct texture-path strategy.
@@ -43,6 +45,10 @@ Use `/ll demo` to verify that the viewer, order display, mode length, undo,
 reset, and 15 second auto-clear work before sharing the addon with a raid.
 Use `/ll mode normal` or `/ll mode heroic` before `/ll demo` to test different
 sequence lengths.
+
+Use `/ll scale 80` to shrink the viewer to 80%, or `/ll scale reset` to restore
+the default 100% size. Scale is saved per account with the rest of the addon
+settings.
 
 Use `/ll add circle`, `/ll add t`, and so on to build a sequence manually.
 The solo commands do not send chat and do not test Blizzard's raid chat delivery;

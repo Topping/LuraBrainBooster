@@ -17,6 +17,8 @@ function LL:PrintHelp()
     self:Print("/ll send circle|x|diamond|t|triangle - test out-of-combat leader/assistant transport")
     self:Print("/ll undo - remove the last local symbol")
     self:Print("/ll mode normal|heroic|mythic - set sequence length")
+    self:Print("/ll scale 50-125 - set viewer scale percent")
+    self:Print("/ll scale reset - reset viewer scale to 100%")
     self:Print("/ll channel raid|instance|party - set the direct macro channel")
     self:Print("/ll strategy - show the selected transmit strategy")
     self:Print("/ll strategy texture - set the direct texture-path strategy")
@@ -70,6 +72,15 @@ function LL:HandleSlash(message)
     elseif command == "mode" then
         local mode = string.lower(rest or "")
         self:SetMode(mode)
+    elseif command == "scale" or command == "size" then
+        local scale = string.lower(rest or "")
+        if scale == "" then
+            self:PrintUIScale()
+        elseif scale == "reset" then
+            self:SetUIScalePercent((self.DEFAULT_UI_SCALE or 1.0) * 100)
+        else
+            self:SetUIScalePercent(tonumber(scale))
+        end
     elseif command == "channel" or command == "chan" then
         self:SetChannel(rest)
     elseif command == "strategy" or command == "strat" then

@@ -76,6 +76,7 @@ function LL:CreateUI()
     MakeDraggable(self, viewer, "viewer")
     self:RestoreFramePosition(viewer, "viewer")
     self.viewerFrame = viewer
+    self:ApplyUIScale()
 
     viewer.background = viewer:CreateTexture(nil, "ARTWORK")
     viewer.background:SetAllPoints(viewer)

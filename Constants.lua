@@ -1,11 +1,14 @@
 local _, LL = ...
 
 LL.ADDON_NAME = "LuraBrainBooster"
-LL.VERSION = "0.4.2"
+LL.VERSION = "0.4.3"
 LL.PREFIX = "LuraBrainBooster"
 
 LL.MAX_SLOTS = 5
 LL.AUTO_CLEAR_SECONDS = 15
+LL.DEFAULT_UI_SCALE = 1.0
+LL.MIN_UI_SCALE = 0.5
+LL.MAX_UI_SCALE = 1.25
 LL.UNDO_RAID_WARNING_TEXT = "LL_UNDO"
 LL.UNDO_MACRO_NAME = "LL Undo"
 LL.UNDO_MACRO_ICON = "Interface/Buttons/UI-GroupLoot-Pass-Up"
@@ -131,6 +134,7 @@ LL.DEFAULTS = {
     strategy = "texture",
     testListen = false,
     autoClearSeconds = LL.AUTO_CLEAR_SECONDS,
+    uiScale = LL.DEFAULT_UI_SCALE,
     positions = {
         viewer = {
             point = "CENTER",
