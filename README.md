@@ -28,9 +28,9 @@ incoming authorized macro payloads in a fixed order display.
 - `/ll channel raid|instance|party` changes the direct macro channel.
 - `/ll strategy` shows the selected transmit strategy and available options.
 - `/ll strategy texture` selects the default direct texture-path strategy.
-- `/ll strategy ping` selects the experimental ping strategy.
-- `/ll pinglog` shows recent experimental ping diagnostics.
-- `/ll pinglog clear` clears recent experimental ping diagnostics.
+- `/ll strategy ping` selects the direct ping strategy.
+- `/ll pinglog` shows recent ping diagnostics.
+- `/ll pinglog clear` clears recent ping diagnostics.
 - `/ll macros` creates or updates account-wide direct caller macros.
 - `/ll macros print` prints direct macro text without creating macros.
 - `/ll reset` clears the local sequence.
@@ -61,14 +61,13 @@ direct texture-path payload behavior. If future strategies are added, every
 addon user must select the same strategy before the pull so incoming signals are
 interpreted the same way.
 
-The `ping` strategy is experimental and not marked encounter-safe. It creates
-one manual `/ping [@player] <number>` macro per symbol plus one undo macro, then
-tries to decode `CHAT_MSG_PING`. Use `/ll test`, press the generated ping
-macros, and inspect `/ll pinglog` to verify whether the current client exposes
-distinct, reliable ping payloads. `/ll channel` does not affect ping macros, and
-`/ll send` is unsupported for ping because addon/script ping sending is
-protected. Like the texture strategy, decoded pings are accepted only from the
-group leader or a raid assistant.
+The `ping` strategy creates one manual `/ping [@player] <number>` macro per
+symbol plus one undo macro, then decodes `CHAT_MSG_PING`. Use `/ll test`, press
+the generated ping macros, and inspect `/ll pinglog` to verify payloads on the
+current client. `/ll channel` does not affect ping macros, and `/ll send` is
+unsupported for ping because addon/script ping sending is protected. Like the
+texture strategy, decoded pings are accepted only from the group leader or a
+raid assistant.
 
 For an instanced boss test, try `/ll channel raid` first. Make the caller the
 group leader or a raid assistant. If a hand-typed
@@ -90,10 +89,13 @@ and use the created direct macros for the pull.
 5. During `Death's Dirge`, press one macro for each rune in the order the boss
    shows them.
 6. If you misclick, press `LL Undo`. With `texture`, it sends a raid warning
-   event. With experimental `ping`, it sends `/ping [@player] 6`. Every
+   event. With `ping`, it sends `/ping [@player] 6`. Every
    listening client using the same strategy removes the most recent symbol.
 
 During the encounter, any leader or assistant group chat from an authorized
 caller can look like a rune input to the addon because Midnight hides chat
 contents from addon code. Keep authorized caller chat clear while
 `Death's Dirge` is being entered.
+
+Outside March on Quel'Danas and outside explicit `/ll test` mode, the addon
+keeps its strategy-specific chat and ping events unregistered.

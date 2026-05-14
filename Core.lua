@@ -150,6 +150,41 @@ function LL:GetMacroIcon(icon)
     return icon
 end
 
+local function NormalizeLookupText(value)
+    if type(value) ~= "string" then
+        return nil
+    end
+
+    local normalized = string.lower(value)
+    normalized = normalized:gsub("[^%w]+", "")
+
+    if normalized == "" then
+        return nil
+    end
+
+    return normalized
+end
+
+function LL:IsTargetRaidInstance()
+    if not GetInstanceInfo then
+        return false
+    end
+
+    local instanceName, instanceType, _, _, _, _, _, instanceID = GetInstanceInfo()
+    if instanceType ~= "raid" then
+        return false
+    end
+
+    if self.TARGET_RAID_INSTANCE_IDS and instanceID and self.TARGET_RAID_INSTANCE_IDS[instanceID] then
+        return true
+    end
+
+    local normalizedName = NormalizeLookupText(instanceName)
+    return normalizedName
+        and self.TARGET_RAID_INSTANCE_NAMES
+        and self.TARGET_RAID_INSTANCE_NAMES[normalizedName] == true
+end
+
 function LL:IsMidnightFallsEncounter(encounterID, encounterName)
     if self.ENCOUNTER_IDS and encounterID and self.ENCOUNTER_IDS[encounterID] then
         return true
@@ -161,6 +196,63 @@ function LL:IsMidnightFallsEncounter(encounterID, encounterName)
     end
 
     return false
+end
+
+local LOCATION_EVENTS = {
+    "PLAYER_ENTERING_WORLD",
+    "ZONE_CHANGED_NEW_AREA",
+}
+
+local ENCOUNTER_EVENTS = {
+    "ENCOUNTER_START",
+    "ENCOUNTER_END",
+}
+
+function LL:RegisterLocationEvents()
+    if self.locationEventsRegistered then
+        return
+    end
+
+    for _, event in ipairs(LOCATION_EVENTS) do
+        self.eventFrame:RegisterEvent(event)
+    end
+
+    self.locationEventsRegistered = true
+end
+
+function LL:SetEncounterTrackingEnabled(enabled)
+    enabled = not not enabled
+
+    if self.encounterTrackingEnabled == enabled then
+        return
+    end
+
+    for _, event in ipairs(ENCOUNTER_EVENTS) do
+        if enabled then
+            self.eventFrame:RegisterEvent(event)
+        else
+            self.eventFrame:UnregisterEvent(event)
+        end
+    end
+
+    self.encounterTrackingEnabled = enabled
+end
+
+function LL:RefreshEncounterTracking()
+    self:SetEncounterTrackingEnabled(self.inTargetRaid or self.inEncounter)
+end
+
+function LL:UpdateTargetRaidState()
+    local wasInTargetRaid = self.inTargetRaid
+    self.inTargetRaid = self:IsTargetRaidInstance()
+
+    if wasInTargetRaid and not self.inTargetRaid and self.inEncounter then
+        self.inEncounter = false
+        self:ResetSequence("zone")
+    end
+
+    self:RefreshEncounterTracking()
+    self:RefreshListening()
 end
 
 function LL:UnregisterStrategyEvents()
@@ -616,12 +708,16 @@ function LL:OnAddonLoaded()
 
     self.sequenceCount = 0
     self.inEncounter = false
+    self.inTargetRaid = false
+    self.locationEventsRegistered = nil
+    self.encounterTrackingEnabled = nil
     self.registeredStrategyEvents = nil
     self.registeredStrategyEventSet = nil
 
     self:CreateUI()
     self:ResetSequence("load")
-    self:RefreshListening()
+    self:RegisterLocationEvents()
+    self:UpdateTargetRaidState()
     self:RegisterSlashCommands()
 
     if self.db.shown then
@@ -637,11 +733,14 @@ function LL:OnEvent(event, ...)
     if event == "ADDON_LOADED" then
         local addonName = ...
         if addonName == self.ADDON_NAME then
+            self.eventFrame:UnregisterEvent("ADDON_LOADED")
             self:OnAddonLoaded()
         end
+    elseif event == "PLAYER_ENTERING_WORLD" or event == "ZONE_CHANGED_NEW_AREA" then
+        self:UpdateTargetRaidState()
     elseif event == "ENCOUNTER_START" then
         local encounterID, encounterName = ...
-        if self:IsMidnightFallsEncounter(encounterID, encounterName) then
+        if self.inTargetRaid and self:IsMidnightFallsEncounter(encounterID, encounterName) then
             self.inEncounter = true
             self:ResetSequence("encounter")
             self:RefreshListening()
@@ -650,6 +749,7 @@ function LL:OnEvent(event, ...)
     elseif event == "ENCOUNTER_END" then
         if self.inEncounter then
             self.inEncounter = false
+            self:RefreshEncounterTracking()
             self:RefreshListening()
             self:ResetSequence("encounter-end")
         end
@@ -663,8 +763,6 @@ end
 
 LL.eventFrame = CreateFrame("Frame")
 LL.eventFrame:RegisterEvent("ADDON_LOADED")
-LL.eventFrame:RegisterEvent("ENCOUNTER_START")
-LL.eventFrame:RegisterEvent("ENCOUNTER_END")
 LL.eventFrame:SetScript("OnEvent", function(_, event, ...)
     LL:OnEvent(event, ...)
 end)

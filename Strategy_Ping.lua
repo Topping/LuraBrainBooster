@@ -255,8 +255,8 @@ end
 LL:RegisterStrategy({
     key = "ping",
     label = "Ping",
-    description = "Experimental direct /ping macros decoded from CHAT_MSG_PING.",
-    encounterSafe = false,
+    description = "Direct /ping macros decoded from CHAT_MSG_PING.",
+    encounterSafe = true,
     requiresMatchingStrategy = true,
     usesChannel = false,
     events = {

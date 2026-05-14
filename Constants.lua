@@ -1,7 +1,7 @@
 local _, LL = ...
 
 LL.ADDON_NAME = "LuraBrainBooster"
-LL.VERSION = "0.4.6"
+LL.VERSION = "0.4.7"
 LL.PREFIX = "LuraBrainBooster"
 
 LL.MAX_SLOTS = 5
@@ -12,6 +12,12 @@ LL.MAX_UI_SCALE = 1.25
 LL.UNDO_RAID_WARNING_TEXT = "LL_UNDO"
 LL.UNDO_MACRO_NAME = "LL Undo"
 LL.UNDO_MACRO_ICON = "Interface/Buttons/UI-GroupLoot-Pass-Up"
+
+-- Fill numeric instance IDs here once Blizzard's final raid ID is known.
+LL.TARGET_RAID_INSTANCE_IDS = {}
+LL.TARGET_RAID_INSTANCE_NAMES = {
+    marchonqueldanas = true,
+}
 
 -- Viewer layout coordinates are relative to the center of the 410x410 frame:
 -- positive x moves right, positive y moves up.

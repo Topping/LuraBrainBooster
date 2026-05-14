@@ -79,10 +79,8 @@ WoW texture rendering. Use `kind = "rune"` for decoded strategies.
   or compare the chat payload.
 - Register normal group chat events when needed to receive raid assistant
   messages, then reject normal members by sender role before rendering.
-- Do not parse live encounter raid chat unless the strategy is explicitly
-  experimental and not marked encounter-safe.
-- Ping-based strategies must remain experimental until in-game tests prove
-  `CHAT_MSG_PING` is readable, distinct for every macro, and reliable in combat.
-  They should reuse `LL:IsAuthorizedCallerSender(...)` before decoding a ping
-  into a rendered rune.
+- Do not parse live encounter raid chat unless that specific strategy has been
+  reviewed and marked encounter-safe.
+- Ping-based strategies should reuse `LL:IsAuthorizedCallerSender(...)` before
+  decoding a ping into a rendered rune.
 - Future strategy files should load after `Strategies.lua` and before `Core.lua`.
