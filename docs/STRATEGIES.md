@@ -64,7 +64,7 @@ macro text.
 Strategies should output one of these:
 
 ```lua
-{ kind = "texture", path = "Interface/AddOns/LuraBrainBooster/Textures/circle.png" }
+{ kind = "texture", path = "Interface/AddOns/LuraBrainBooster/Textures/circle.tga" }
 { kind = "rune", key = "circle" }
 ```
 

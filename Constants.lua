@@ -1,7 +1,7 @@
 local _, LL = ...
 
 LL.ADDON_NAME = "LuraBrainBooster"
-LL.VERSION = "0.4.3"
+LL.VERSION = "0.4.5"
 LL.PREFIX = "LuraBrainBooster"
 
 LL.MAX_SLOTS = 5
@@ -17,7 +17,7 @@ LL.UNDO_MACRO_ICON = "Interface/Buttons/UI-GroupLoot-Pass-Up"
 -- positive x moves right, positive y moves up.
 LL.UI_LAYOUT = {
     viewerSize = 410,
-    backgroundTexture = "Interface\\AddOns\\LuraBrainBooster\\Textures\\arena_background.png",
+    backgroundTexture = "Interface\\AddOns\\LuraBrainBooster\\Textures\\arena_background.tga",
     slotSize = 65,
 
     slotOffsetX = 0,
@@ -83,40 +83,40 @@ LL.RUNE_DEFS = {
         key = "circle",
         label = "Circle",
         macroName = "LL Circle",
-        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/circle.png",
-        chat = "Interface/AddOns/LuraBrainBooster/Textures/circle.png",
+        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/circle.tga",
+        chat = "Interface/AddOns/LuraBrainBooster/Textures/circle.tga",
         aliases = { "orange", "o" },
     },
     {
         key = "cross",
         label = "X",
         macroName = "LL X",
-        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/x.png",
-        chat = "Interface/AddOns/LuraBrainBooster/Textures/x.png",
+        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/x.tga",
+        chat = "Interface/AddOns/LuraBrainBooster/Textures/x.tga",
         aliases = { "x" },
     },
     {
         key = "diamond",
         label = "Diamond",
         macroName = "LL Diamond",
-        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/diamond.png",
-        chat = "Interface/AddOns/LuraBrainBooster/Textures/diamond.png",
+        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/diamond.tga",
+        chat = "Interface/AddOns/LuraBrainBooster/Textures/diamond.tga",
         aliases = { "square" },
     },
     {
         key = "t",
         label = "T",
         macroName = "LL T",
-        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/t.png",
-        chat = "Interface/AddOns/LuraBrainBooster/Textures/t.png",
+        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/t.tga",
+        chat = "Interface/AddOns/LuraBrainBooster/Textures/t.tga",
         aliases = { "tee", "skull" },
     },
     {
         key = "triangle",
         label = "Triangle",
         macroName = "LL Triangle",
-        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/triangle.png",
-        chat = "Interface/AddOns/LuraBrainBooster/Textures/triangle.png",
+        macroIcon = "Interface/AddOns/LuraBrainBooster/Textures/triangle.tga",
+        chat = "Interface/AddOns/LuraBrainBooster/Textures/triangle.tga",
         aliases = { "tri" },
     },
 }

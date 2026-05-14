@@ -60,14 +60,14 @@ The current rune order/macros are:
 
 These map to:
 
-- `Interface\AddOns\LuraBrainBooster\Textures\circle.png`
-- `Interface\AddOns\LuraBrainBooster\Textures\x.png`
-- `Interface\AddOns\LuraBrainBooster\Textures\diamond.png`
-- `Interface\AddOns\LuraBrainBooster\Textures\t.png`
-- `Interface\AddOns\LuraBrainBooster\Textures\triangle.png`
+- `Interface\AddOns\LuraBrainBooster\Textures\circle.tga`
+- `Interface\AddOns\LuraBrainBooster\Textures\x.tga`
+- `Interface\AddOns\LuraBrainBooster\Textures\diamond.tga`
+- `Interface\AddOns\LuraBrainBooster\Textures\t.tga`
+- `Interface\AddOns\LuraBrainBooster\Textures\triangle.tga`
 
 In code/chat payloads, these are stored with forward slashes, e.g.
-`Interface/AddOns/LuraBrainBooster/Textures/circle.png`. Keep that style for macro
+`Interface/AddOns/LuraBrainBooster/Textures/circle.tga`. Keep that style for macro
 payloads.
 
 If texture files are added or renamed while WoW is already open, users should

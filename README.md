@@ -72,7 +72,7 @@ group leader or a raid assistant.
 
 For an instanced boss test, try `/ll channel raid` first. Make the caller the
 group leader or a raid assistant. If a hand-typed
-`/raid Interface/AddOns/LuraBrainBooster/Textures/circle.png` works, run `/ll macros`
+`/raid Interface/AddOns/LuraBrainBooster/Textures/circle.tga` works, run `/ll macros`
 and use the created direct macros for the pull.
 
 ## Caller Workflow
