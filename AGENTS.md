@@ -7,8 +7,7 @@ This repository is a World of Warcraft Retail addon for the Midnight expansion.
 The addon helps with the L'ura / Midnight Falls boss in the March on
 Quel'Danas raid, specifically the `Death's Dirge` memory-game mechanic.
 
-The target users are a community guild with players who have various mental
-disabilities. The addon should reduce memory/translation load without
+The addon should reduce memory/translation load without
 automating gameplay or making player decisions.
 
 ## Midnight Restrictions To Respect
