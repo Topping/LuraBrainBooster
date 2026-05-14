@@ -2,7 +2,7 @@
 ## Title: L'ura Brain Booster
 ## Notes: Midnight Falls / L'ura Death's Dirge memory helper.
 ## Author: Nikolai & Codex
-## Version: 0.4.5
+## Version: 0.4.6
 ## SavedVariables: LuraBrainBoosterDB
 
 Constants.lua

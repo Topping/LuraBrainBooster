@@ -1,7 +1,7 @@
 local _, LL = ...
 
 LL.ADDON_NAME = "LuraBrainBooster"
-LL.VERSION = "0.4.5"
+LL.VERSION = "0.4.6"
 LL.PREFIX = "LuraBrainBooster"
 
 LL.MAX_SLOTS = 5

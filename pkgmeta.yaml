@@ -5,9 +5,3 @@ ignore:
   - docs
   - internal-docs
   - README.md
-  - Textures/arena_background.png
-  - Textures/circle.png
-  - Textures/diamond.png
-  - Textures/t.png
-  - Textures/triangle.png
-  - Textures/x.png
