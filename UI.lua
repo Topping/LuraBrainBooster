@@ -156,6 +156,7 @@ function LL:ShowViewer()
     if self.db then
         self.db.shown = true
     end
+    self:RefreshSettingsPanel()
 end
 
 function LL:HideViewer()
@@ -167,6 +168,7 @@ function LL:HideViewer()
     if self.db then
         self.db.shown = false
     end
+    self:RefreshSettingsPanel()
 end
 
 function LL:ToggleViewer()

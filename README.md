@@ -16,9 +16,11 @@ The default live flow is intentionally simple:
 
 Install the addon as `Interface/AddOns/LuraBrainBooster`, then restart WoW if you added or renamed any texture files. A `/reload` is often not enough for new image files.
 
-Use `/ll` to show or hide the viewer. Use `/ll unlock` to drag it, `/ll lock` to lock it again, and `/ll scale 80` or `/ll scale reset` to adjust the saved viewer size.
+Open **Options > AddOns > L'ura Brain Booster** to configure the viewer, encounter mode, macro channel, strategy, caller macros, and local testing. The `/ll` commands remain available as an alternate quick path.
 
-Set the sequence length with `/ll mode normal`, `/ll mode heroic`, or `/ll mode mythic`. Normal shows 3 slots; Heroic and Mythic show 5.
+Use the settings panel or `/ll` to show or hide the viewer. Unlock the viewer to drag it, lock it again when positioned, and adjust the saved viewer size from the scale control or `/ll scale`.
+
+Set the sequence length from the settings panel or with `/ll mode normal`, `/ll mode heroic`, or `/ll mode mythic`. Normal shows 3 slots; Heroic and Mythic show 5.
 
 For live use, keep the default `texture` strategy unless the whole group has agreed to use another one:
 
@@ -30,11 +32,11 @@ For live use, keep the default `texture` strategy unless the whole group has agr
 
 Open `/macro`, then drag `LL Circle`, `LL X`, `LL Diamond`, `LL T`, `LL Triangle`, and `LL Undo` to the caller's action bar. During `Death's Dirge`, the caller presses the rune macros in the order the boss shows them. If the caller misclicks, `LL Undo` removes the most recent symbol from listening clients.
 
-The macro channel can be changed with `/ll channel raid`, `/ll channel instance`, or `/ll channel party`. Re-run `/ll macros` after changing channel or strategy so the account-wide macros are updated.
+The macro channel can be changed in the settings panel or with `/ll channel raid`, `/ll channel instance`, or `/ll channel party`. Use **Create / Update Macros** in settings, or re-run `/ll macros`, after changing channel or strategy so the account-wide macros are updated.
 
 ## Testing
 
-Use `/ll demo` for a local viewer test. It fills the current mode's slots without sending any group message.
+Use **Run Demo** in settings or `/ll demo` for a local viewer test. It fills the current mode's slots without sending any group message.
 
 Use `/ll add circle`, `/ll add x`, `/ll add diamond`, `/ll add t`, or `/ll add triangle` to build a local sequence one symbol at a time. `/ll undo` removes the most recent local symbol.
 
@@ -47,6 +49,22 @@ For an out-of-combat group transport test, make the caller the group leader or a
 Listening clients only accept group test messages from the group leader or a raid assistant. `/ll send` is a testing fallback, not the intended in-encounter path.
 
 For the ping strategy, every addon user must select `/ll strategy ping`, then the caller must run `/ll macros` again. Ping macros ignore `/ll channel`. Use `/ll pinglog` and `/ll pinglog clear` while testing ping payloads.
+
+## Local Deploy
+
+For Windows development, copy `.env.local.example` to `.env.local` and set `LURA_WOW_ADDONS_DIR` to your WoW Retail AddOns folder, for example:
+
+```text
+LURA_WOW_ADDONS_DIR=C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns
+```
+
+Then deploy the current repo build with PowerShell:
+
+```powershell
+.\scripts\Deploy-Local.ps1
+```
+
+Use `.\scripts\Deploy-Local.ps1 -Plan` to preview the files, or `.\scripts\Deploy-Local.ps1 -Clean` to remove the existing deployed `LuraBrainBooster` folder before copying. `.env.local` is gitignored so your local install path stays private.
 
 ## Commands
 

@@ -60,7 +60,7 @@ function LL:PrintUIScale()
     self:Print("Viewer scale is " .. FormatScalePercent(self:GetUIScale()) .. "%. Use /ll scale " .. minPercent .. "-" .. maxPercent .. ", or /ll scale reset.")
 end
 
-function LL:SetUIScalePercent(percent)
+function LL:SetUIScalePercent(percent, silent)
     local minScale = self.MIN_UI_SCALE or 0.5
     local maxScale = self.MAX_UI_SCALE or 1.25
     local minPercent = minScale * 100
@@ -73,7 +73,10 @@ function LL:SetUIScalePercent(percent)
 
     self.db.uiScale = percent / 100
     self:ApplyUIScale()
-    self:Print("Viewer scale set to " .. FormatScalePercent(self.db.uiScale) .. "%.")
+    self:RefreshSettingsPanel()
+    if not silent then
+        self:Print("Viewer scale set to " .. FormatScalePercent(self.db.uiScale) .. "%.")
+    end
 end
 
 function LL:GetChannel()
@@ -303,6 +306,7 @@ end
 function LL:SetTestListening(enabled)
     self.db.testListen = not not enabled
     self:RefreshListening()
+    self:RefreshSettingsPanel()
 end
 
 function LL:AppendRenderValue(renderValue, forceLocal)
@@ -413,7 +417,7 @@ function LL:SendTestRune(value)
     self:Print("Sent " .. rune.label .. " with " .. strategy.label .. " to " .. chatType .. " for transport testing. Listeners accept this only from the group leader or a raid assistant.")
 end
 
-function LL:SetChannel(channel)
+function LL:SetChannel(channel, silent)
     channel = string.lower(channel or "")
 
     if not self.CHANNELS[channel] then
@@ -423,13 +427,16 @@ function LL:SetChannel(channel)
 
     self.db.channel = channel
 
-    self:Print("Macro channel set to " .. self.CHANNELS[channel].label .. " (" .. self.CHANNELS[channel].command .. ").")
+    if not silent then
+        self:Print("Macro channel set to " .. self.CHANNELS[channel].label .. " (" .. self.CHANNELS[channel].command .. ").")
+    end
     local strategy = self:GetStrategy()
-    if strategy and strategy.usesChannel == false then
+    if strategy and strategy.usesChannel == false and not silent then
         self:Print("The selected " .. strategy.label .. " strategy ignores channel settings.")
     end
 
     self:UpdateStatusText()
+    self:RefreshSettingsPanel()
 end
 
 function LL:ListStrategies()
@@ -451,7 +458,7 @@ function LL:ListStrategies()
     end
 end
 
-function LL:SetStrategy(strategy)
+function LL:SetStrategy(strategy, silent)
     strategy = string.lower(strategy or "")
     strategy = strategy:gsub("^%s+", ""):gsub("%s+$", "")
 
@@ -483,7 +490,10 @@ function LL:SetStrategy(strategy)
     self.db.strategy = strategy
     self:ResetSequence("strategy")
     self:RefreshListening()
-    self:Print("Strategy set to " .. self.STRATEGIES[strategy].label .. ". Run /ll macros to update caller macros.")
+    self:RefreshSettingsPanel()
+    if not silent then
+        self:Print("Strategy set to " .. self.STRATEGIES[strategy].label .. ". Run /ll macros to update caller macros.")
+    end
 end
 
 function LL:BuildMacroSpecs()
@@ -649,7 +659,7 @@ function LL:ArmAutoClear()
     end
 end
 
-function LL:SetMode(mode)
+function LL:SetMode(mode, silent)
     if not self.MODES[mode] then
         self:Print("Unknown mode. Use normal, heroic, or mythic.")
         return
@@ -658,13 +668,19 @@ function LL:SetMode(mode)
     self.db.mode = mode
     self:ResetSequence("mode")
     self:UpdateModeDisplay()
-    self:Print("Mode set to " .. self.MODES[mode].label .. ".")
+    self:RefreshSettingsPanel()
+    if not silent then
+        self:Print("Mode set to " .. self.MODES[mode].label .. ".")
+    end
 end
 
-function LL:SetLocked(locked)
+function LL:SetLocked(locked, silent)
     self.db.locked = not not locked
     self:UpdateLockState()
-    self:Print(self.db.locked and "Frame locked." or "Frame unlocked. Drag the viewer.")
+    self:RefreshSettingsPanel()
+    if not silent then
+        self:Print(self.db.locked and "Frame locked." or "Frame unlocked. Drag the viewer.")
+    end
 end
 
 function LL:SaveFramePosition(frame, key)
@@ -719,6 +735,7 @@ function LL:OnAddonLoaded()
     self:RegisterLocationEvents()
     self:UpdateTargetRaidState()
     self:RegisterSlashCommands()
+    self:RegisterSettingsPanel()
 
     if self.db.shown then
         self:ShowViewer()

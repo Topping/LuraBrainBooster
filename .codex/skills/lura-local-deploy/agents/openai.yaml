@@ -1,0 +1,4 @@
+interface:
+  display_name: "L'ura Local Deploy"
+  short_description: "Deploy the addon to a local WoW folder"
+  default_prompt: "Use $lura-local-deploy to deploy LuraBrainBooster into my local WoW AddOns folder."

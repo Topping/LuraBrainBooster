@@ -1,7 +1,7 @@
 local _, LL = ...
 
 LL.ADDON_NAME = "LuraBrainBooster"
-LL.VERSION = "0.4.7"
+LL.VERSION = "0.4.8"
 LL.PREFIX = "LuraBrainBooster"
 
 LL.MAX_SLOTS = 5
@@ -133,7 +133,7 @@ LL.ENCOUNTER_NAMES = {
 }
 
 LL.DEFAULTS = {
-    locked = true,
+    locked = false,
     shown = true,
     mode = "heroic",
     channel = "raid",
