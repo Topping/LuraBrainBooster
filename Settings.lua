@@ -328,7 +328,7 @@ function LL:CreateSettingsPanel()
     y = y - 42 - SECTION_GAP
 
     y = AddSection(content, "Testing", y)
-    controls.testListen = AddCheckbox(content, "Listen outside the encounter", LEFT, y, function(checked)
+    controls.testListen = AddCheckbox(content, "Listen outside the encounter, except unrelated instances", LEFT, y, function(checked)
         LL:SetTestListening(checked)
     end)
     y = y - ROW

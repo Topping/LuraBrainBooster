@@ -24,6 +24,20 @@ local GROUP_CHAT_EVENTS = {
     CHAT_MSG_INSTANCE_CHAT_LEADER = true,
 }
 
+local CHAT_GUID_ARG_INDEX = 12
+
+local function IsNonEmptyPublicString(value)
+    if type(value) ~= "string" then
+        return false
+    end
+
+    local ok, isNonEmpty = pcall(function()
+        return value ~= ""
+    end)
+
+    return ok and isNonEmpty
+end
+
 function LL:NormalizeCallerSender(sender)
     if type(sender) ~= "string" or sender == "" then
         return nil
@@ -86,11 +100,20 @@ local function SenderMatchesUnit(sender, unit)
 end
 
 local function SenderGUIDMatchesUnit(guid, unit)
-    if type(guid) ~= "string" or guid == "" or not UnitGUID or not UnitExists or not UnitExists(unit) then
+    if not IsNonEmptyPublicString(guid) or not UnitGUID or not UnitExists or not UnitExists(unit) then
         return false
     end
 
-    return UnitGUID(unit) == guid
+    local unitGUID = UnitGUID(unit)
+    if not unitGUID then
+        return false
+    end
+
+    local ok, matches = pcall(function()
+        return unitGUID == guid
+    end)
+
+    return ok and matches
 end
 
 local function UnitCanCallRunes(unit)
@@ -103,12 +126,13 @@ end
 
 function LL:IsAuthorizedCallerSender(sender, guid)
     -- Check the public roster role only; the chat payload stays opaque.
-    if (type(sender) ~= "string" or sender == "") and (type(guid) ~= "string" or guid == "") then
-        return false
-    end
+    local canUseGUID = IsNonEmptyPublicString(guid)
+    local allowSenderInspection = not (self.IsInAnyInstance and self:IsInAnyInstance())
+    local canUseSender = allowSenderInspection and IsNonEmptyPublicString(sender)
 
     if UnitCanCallRunes("player")
-        and (SenderMatchesUnit(sender, "player") or SenderGUIDMatchesUnit(guid, "player")) then
+        and ((canUseGUID and SenderGUIDMatchesUnit(guid, "player"))
+            or (canUseSender and SenderMatchesUnit(sender, "player"))) then
         return true
     end
 
@@ -121,7 +145,8 @@ function LL:IsAuthorizedCallerSender(sender, guid)
         for index = 1, groupSize do
             local unit = "raid" .. index
             if UnitCanCallRunes(unit)
-                and (SenderMatchesUnit(sender, unit) or SenderGUIDMatchesUnit(guid, unit)) then
+                and ((canUseGUID and SenderGUIDMatchesUnit(guid, unit))
+                    or (canUseSender and SenderMatchesUnit(sender, unit))) then
                 return true
             end
         end
@@ -129,7 +154,8 @@ function LL:IsAuthorizedCallerSender(sender, guid)
         for index = 1, 4 do
             local unit = "party" .. index
             if UnitCanCallRunes(unit)
-                and (SenderMatchesUnit(sender, unit) or SenderGUIDMatchesUnit(guid, unit)) then
+                and ((canUseGUID and SenderGUIDMatchesUnit(guid, unit))
+                    or (canUseSender and SenderMatchesUnit(sender, unit))) then
                 return true
             end
         end
@@ -176,7 +202,8 @@ LL:RegisterStrategy({
     HandleEvent = function(addon, event, ...)
         if event == "CHAT_MSG_RAID_WARNING" then
             local _, sender = ...
-            if addon:IsAuthorizedCallerSender(sender) then
+            local guid = select(CHAT_GUID_ARG_INDEX, ...)
+            if addon:IsAuthorizedCallerSender(sender, guid) then
                 addon:UndoLast()
             end
             return
@@ -184,7 +211,8 @@ LL:RegisterStrategy({
 
         if GROUP_CHAT_EVENTS[event] then
             local sender = select(2, ...)
-            if addon:IsAuthorizedCallerSender(sender) then
+            local guid = select(CHAT_GUID_ARG_INDEX, ...)
+            if addon:IsAuthorizedCallerSender(sender, guid) then
                 local message = ...
                 addon:AppendRenderValue({
                     kind = "texture",

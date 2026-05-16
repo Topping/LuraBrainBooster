@@ -71,7 +71,7 @@ Use `.\scripts\Deploy-Local.ps1 -Plan` to preview the files, or `.\scripts\Deplo
 - `/ll` toggles the viewer.
 - `/ll lock` locks the viewer.
 - `/ll unlock` unlocks the viewer for dragging.
-- `/ll test` toggles strategy event listening outside the target encounter.
+- `/ll test` toggles strategy event listening outside the target encounter, except in unrelated instances.
 - `/ll demo` loads a local solo demo sequence.
 - `/ll add circle|x|diamond|t|triangle` adds one local test rune.
 - `/ll send circle|x|diamond|t|triangle` sends one out-of-combat group test signal when the selected strategy supports it.
@@ -115,7 +115,7 @@ During the encounter, authorized group chat from the caller can be interpreted a
 
 ## Implementation Approach
 
-The addon listens only while the L'ura encounter is active in the target raid, or while `/ll test` is enabled. Outside those states, strategy-specific events are unregistered.
+The addon listens only while the L'ura encounter is active in the target raid, or while `/ll test` is enabled outside unrelated instances. Outside those states, strategy-specific events are unregistered.
 
 Incoming signals are accepted only from the current group leader or a raid assistant, using public group roster information. The addon does not rely on combat-log solving, private aura scanning, addon-message sync, automatic assignment, target markers, movement, casting, or secret-value decoding.
 

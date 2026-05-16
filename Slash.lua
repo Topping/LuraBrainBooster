@@ -11,7 +11,7 @@ function LL:PrintHelp()
     self:Print("/ll - toggle the viewer")
     self:Print("/ll lock - lock the viewer")
     self:Print("/ll unlock - unlock and drag the viewer")
-    self:Print("/ll test - listen to selected strategy events outside the encounter")
+    self:Print("/ll test - listen outside the encounter while not in unrelated instances")
     self:Print("/ll demo - load a local solo demo sequence")
     self:Print("/ll add circle|cross|diamond|t|triangle - add one local test rune")
     self:Print("/ll send circle|x|diamond|t|triangle - test out-of-combat leader/assistant transport")
@@ -60,7 +60,11 @@ function LL:HandleSlash(message)
         self:SetLocked(false)
     elseif command == "test" or command == "listen" then
         self:SetTestListening(not self.db.testListen)
-        self:Print("Test listening " .. (self.db.testListen and "enabled." or "disabled."))
+        if self.db.testListen and self:IsInNonTargetInstance() then
+            self:Print("Test listening enabled, but paused in this unrelated instance.")
+        else
+            self:Print("Test listening " .. (self.db.testListen and "enabled." or "disabled."))
+        end
     elseif command == "demo" then
         self:RunDemoSequence()
     elseif command == "add" or command == "rune" then

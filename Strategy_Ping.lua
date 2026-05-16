@@ -117,15 +117,32 @@ local function ValueToLogString(value)
         return value and "true" or "false"
     end
 
-    return tostring(value):gsub("|", "||")
+    local ok, text = pcall(tostring, value)
+    if not ok then
+        return "<restricted>"
+    end
+
+    return text:gsub("|", "||")
+end
+
+local function IsNonEmptyStringValue(value)
+    if type(value) ~= "string" then
+        return false
+    end
+
+    local ok, isNonEmpty = pcall(function()
+        return value ~= ""
+    end)
+
+    return ok and isNonEmpty
 end
 
 local function GetPingSenderKey(playerName, guid)
-    if guid and guid ~= "" then
+    if IsNonEmptyStringValue(guid) then
         return guid
     end
 
-    if playerName and playerName ~= "" then
+    if IsNonEmptyStringValue(playerName) then
         return playerName
     end
 
@@ -137,7 +154,7 @@ local function IsAuthorizedPingSender(addon, guid, ...)
         return true, nil
     end
 
-    if type(guid) == "string" and guid ~= "" and addon:IsAuthorizedCallerSender(nil, guid) then
+    if addon:IsAuthorizedCallerSender(nil, guid) then
         return true, guid
     end
 

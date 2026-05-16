@@ -188,6 +188,19 @@ function LL:IsTargetRaidInstance()
         and self.TARGET_RAID_INSTANCE_NAMES[normalizedName] == true
 end
 
+function LL:IsInAnyInstance()
+    if not IsInInstance then
+        return false
+    end
+
+    local inInstance = IsInInstance()
+    return inInstance == true
+end
+
+function LL:IsInNonTargetInstance()
+    return not self.inTargetRaid and self:IsInAnyInstance()
+end
+
 function LL:IsMidnightFallsEncounter(encounterID, encounterName)
     if self.ENCOUNTER_IDS and encounterID and self.ENCOUNTER_IDS[encounterID] then
         return true
@@ -292,7 +305,8 @@ function LL:RegisterStrategyEvents()
 end
 
 function LL:RefreshListening()
-    local shouldListen = self.inEncounter or (self.db and self.db.testListen)
+    local testListen = self.db and self.db.testListen and not self:IsInNonTargetInstance()
+    local shouldListen = self.inEncounter or testListen
 
     if shouldListen then
         self:RegisterStrategyEvents()

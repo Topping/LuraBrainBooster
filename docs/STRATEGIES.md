@@ -75,8 +75,9 @@ WoW texture rendering. Use `kind = "rune"` for decoded strategies.
 
 - Do not add combat log, aura scanning, marker automation, targeting, movement,
   casting, or addon-message sync.
-- Sender filtering may use public group roster role APIs, but must not inspect
-  or compare the chat payload.
+- Sender filtering may use public group roster role APIs. In instances, prefer
+  chat GUIDs and avoid inspecting sender strings; never inspect or compare the
+  chat payload.
 - Register normal group chat events when needed to receive raid assistant
   messages, then reject normal members by sender role before rendering.
 - Do not parse live encounter raid chat unless that specific strategy has been
