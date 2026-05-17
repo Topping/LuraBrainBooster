@@ -269,6 +269,68 @@ function LL:PrintPingDiagnostics()
     end
 end
 
+function LL:HandlePingStrategyEvent(event, ...)
+    if event ~= "CHAT_MSG_PING" then
+        return false
+    end
+
+    local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, suppressRaidIcons = ...
+    if IsEmptyPingPayload(text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID) then
+        return true
+    end
+
+    local action, normalized = DecodePingAction(text, playerName, channelName, playerName2, channelBaseName)
+    local authorized, pingSender = IsAuthorizedPingSender(self, guid, text, playerName, playerName2)
+    local senderKey = GetPingSenderKey(pingSender or playerName, guid)
+    local accepted = false
+    local reason = "unknown-payload"
+
+    if action and not authorized then
+        reason = "unauthorized-sender"
+    elseif action and not AcceptPingSender(self, senderKey, action) then
+        reason = "other-sender"
+    elseif action == "undo" then
+        accepted = true
+        reason = ""
+        self:UndoLast()
+    elseif action then
+        accepted = true
+        reason = ""
+        self:AppendRenderValue({
+            kind = "rune",
+            key = action,
+        })
+    end
+
+    RecordPingDiagnostic(self, {
+        time = ValueToLogString(GetTime and GetTime() or 0),
+        text = ValueToLogString(text),
+        normalized = normalized or "nil",
+        playerName = ValueToLogString(playerName),
+        sender = ValueToLogString(pingSender),
+        guid = ValueToLogString(guid),
+        action = action or "nil",
+        lineID = ValueToLogString(lineID),
+        channelName = ValueToLogString(channelName),
+        playerName2 = ValueToLogString(playerName2),
+        languageName = ValueToLogString(languageName),
+        specialFlags = ValueToLogString(specialFlags),
+        zoneChannelID = ValueToLogString(zoneChannelID),
+        channelIndex = ValueToLogString(channelIndex),
+        channelBaseName = ValueToLogString(channelBaseName),
+        languageID = ValueToLogString(languageID),
+        bnSenderID = ValueToLogString(bnSenderID),
+        isMobile = ValueToLogString(isMobile),
+        isSubtitle = ValueToLogString(isSubtitle),
+        hideSenderInLetterbox = ValueToLogString(hideSenderInLetterbox),
+        suppressRaidIcons = ValueToLogString(suppressRaidIcons),
+        accepted = accepted,
+        reason = reason,
+    })
+
+    return true
+end
+
 LL:RegisterStrategy({
     key = "ping",
     label = "Ping",
@@ -296,62 +358,52 @@ LL:RegisterStrategy({
     end,
 
     HandleEvent = function(addon, event, ...)
-        if event ~= "CHAT_MSG_PING" then
+        addon:HandlePingStrategyEvent(event, ...)
+    end,
+})
+
+LL:RegisterStrategy({
+    key = "debug",
+    label = "Debug",
+    description = "Diagnostic macros send both chat and ping; listeners accept either transport.",
+    encounterSafe = true,
+    requiresMatchingStrategy = true,
+    usesChannel = true,
+    events = {
+        "CHAT_MSG_RAID",
+        "CHAT_MSG_RAID_LEADER",
+        "CHAT_MSG_PARTY",
+        "CHAT_MSG_PARTY_LEADER",
+        "CHAT_MSG_INSTANCE_CHAT",
+        "CHAT_MSG_INSTANCE_CHAT_LEADER",
+        "CHAT_MSG_RAID_WARNING",
+        "CHAT_MSG_PING",
+    },
+
+    BuildRuneMacroText = function(addon, rune, channel)
+        return channel.command .. " " .. rune.chat .. "\n/ping [@player] " .. (PING_CODE_BY_RUNE[rune.key] or "1")
+    end,
+
+    BuildUndoMacroText = function(addon)
+        return "/rw " .. addon.UNDO_RAID_WARNING_TEXT .. "\n/ping [@player] 6"
+    end,
+
+    BuildTestRenderValue = function(addon, rune)
+        return {
+            kind = "rune",
+            key = rune.key,
+        }
+    end,
+
+    BuildSendMessage = function(addon, rune)
+        return rune.chat
+    end,
+
+    HandleEvent = function(addon, event, ...)
+        if addon:HandleTextureChatStrategyEvent(event, ...) then
             return
         end
 
-        local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, suppressRaidIcons = ...
-        if IsEmptyPingPayload(text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID) then
-            return
-        end
-
-        local action, normalized = DecodePingAction(text, playerName, channelName, playerName2, channelBaseName)
-        local authorized, pingSender = IsAuthorizedPingSender(addon, guid, text, playerName, playerName2)
-        local senderKey = GetPingSenderKey(pingSender or playerName, guid)
-        local accepted = false
-        local reason = "unknown-payload"
-
-        if action and not authorized then
-            reason = "unauthorized-sender"
-        elseif action and not AcceptPingSender(addon, senderKey, action) then
-            reason = "other-sender"
-        elseif action == "undo" then
-            accepted = true
-            reason = ""
-            addon:UndoLast()
-        elseif action then
-            accepted = true
-            reason = ""
-            addon:AppendRenderValue({
-                kind = "rune",
-                key = action,
-            })
-        end
-
-        RecordPingDiagnostic(addon, {
-            time = ValueToLogString(GetTime and GetTime() or 0),
-            text = ValueToLogString(text),
-            normalized = normalized or "nil",
-            playerName = ValueToLogString(playerName),
-            sender = ValueToLogString(pingSender),
-            guid = ValueToLogString(guid),
-            action = action or "nil",
-            lineID = ValueToLogString(lineID),
-            channelName = ValueToLogString(channelName),
-            playerName2 = ValueToLogString(playerName2),
-            languageName = ValueToLogString(languageName),
-            specialFlags = ValueToLogString(specialFlags),
-            zoneChannelID = ValueToLogString(zoneChannelID),
-            channelIndex = ValueToLogString(channelIndex),
-            channelBaseName = ValueToLogString(channelBaseName),
-            languageID = ValueToLogString(languageID),
-            bnSenderID = ValueToLogString(bnSenderID),
-            isMobile = ValueToLogString(isMobile),
-            isSubtitle = ValueToLogString(isSubtitle),
-            hideSenderInLetterbox = ValueToLogString(hideSenderInLetterbox),
-            suppressRaidIcons = ValueToLogString(suppressRaidIcons),
-            accepted = accepted,
-            reason = reason,
-        })
+        addon:HandlePingStrategyEvent(event, ...)
     end,
 })

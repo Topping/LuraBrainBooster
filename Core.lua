@@ -305,14 +305,10 @@ function LL:RegisterStrategyEvents()
 end
 
 function LL:RefreshListening()
-    local testListen = self.db and self.db.testListen and not self:IsInNonTargetInstance()
-    local shouldListen = self.inEncounter or testListen
-
-    if shouldListen then
-        self:RegisterStrategyEvents()
-    else
-        self:UnregisterStrategyEvents()
-    end
+    -- Temporary diagnostic: keep the selected strategy listening without relying
+    -- on encounter/instance detection. Sender authorization still happens in the
+    -- strategy handler before anything is rendered.
+    self:RegisterStrategyEvents()
 
     self:UpdateStatusText()
 end
@@ -324,10 +320,6 @@ function LL:SetTestListening(enabled)
 end
 
 function LL:AppendRenderValue(renderValue, forceLocal)
-    if not forceLocal and not (self.inEncounter or (self.db and self.db.testListen)) then
-        return
-    end
-
     local maxSlots = self:GetSlotCount()
     if self.sequenceCount >= maxSlots then
         self:ArmAutoClear()

@@ -65,7 +65,14 @@ function LL:NormalizeCallerSender(sender)
 end
 
 local function SenderMatchesUnit(sender, unit)
-    sender = LL:NormalizeCallerSender(sender)
+    local ok, normalizedSender = pcall(function()
+        return LL:NormalizeCallerSender(sender)
+    end)
+    if not ok then
+        return false
+    end
+
+    sender = normalizedSender
     if not sender or not UnitExists or not UnitExists(unit) then
         return false
     end
@@ -127,8 +134,7 @@ end
 function LL:IsAuthorizedCallerSender(sender, guid)
     -- Check the public roster role only; the chat payload stays opaque.
     local canUseGUID = IsNonEmptyPublicString(guid)
-    local allowSenderInspection = not (self.IsInAnyInstance and self:IsInAnyInstance())
-    local canUseSender = allowSenderInspection and IsNonEmptyPublicString(sender)
+    local canUseSender = IsNonEmptyPublicString(sender)
 
     if UnitCanCallRunes("player")
         and ((canUseGUID and SenderGUIDMatchesUnit(guid, "player"))
@@ -159,6 +165,32 @@ function LL:IsAuthorizedCallerSender(sender, guid)
                 return true
             end
         end
+    end
+
+    return false
+end
+
+function LL:HandleTextureChatStrategyEvent(event, ...)
+    if event == "CHAT_MSG_RAID_WARNING" then
+        local _, sender = ...
+        local guid = select(CHAT_GUID_ARG_INDEX, ...)
+        if self:IsAuthorizedCallerSender(sender, guid) then
+            self:UndoLast()
+        end
+        return true
+    end
+
+    if GROUP_CHAT_EVENTS[event] then
+        local sender = select(2, ...)
+        local guid = select(CHAT_GUID_ARG_INDEX, ...)
+        if self:IsAuthorizedCallerSender(sender, guid) then
+            local message = ...
+            self:AppendRenderValue({
+                kind = "texture",
+                path = message,
+            })
+        end
+        return true
     end
 
     return false
@@ -200,25 +232,34 @@ LL:RegisterStrategy({
     end,
 
     HandleEvent = function(addon, event, ...)
-        if event == "CHAT_MSG_RAID_WARNING" then
-            local _, sender = ...
-            local guid = select(CHAT_GUID_ARG_INDEX, ...)
-            if addon:IsAuthorizedCallerSender(sender, guid) then
-                addon:UndoLast()
-            end
-            return
-        end
+        addon:HandleTextureChatStrategyEvent(event, ...)
+    end,
+})
 
-        if GROUP_CHAT_EVENTS[event] then
-            local sender = select(2, ...)
-            local guid = select(CHAT_GUID_ARG_INDEX, ...)
-            if addon:IsAuthorizedCallerSender(sender, guid) then
-                local message = ...
-                addon:AppendRenderValue({
-                    kind = "texture",
-                    path = message,
-                })
-            end
-        end
+LL:RegisterStrategy({
+    key = "local",
+    label = "Local Only",
+    description = "Caller macros render symbols only on this client, with no chat or ping transport.",
+    encounterSafe = true,
+    requiresMatchingStrategy = false,
+    usesChannel = false,
+    events = {},
+
+    BuildRuneMacroText = function(addon, rune)
+        return "/ll add " .. rune.key
+    end,
+
+    BuildUndoMacroText = function()
+        return "/ll undo"
+    end,
+
+    BuildTestRenderValue = function(addon, rune)
+        return {
+            kind = "rune",
+            key = rune.key,
+        }
+    end,
+
+    HandleEvent = function()
     end,
 })

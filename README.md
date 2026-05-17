@@ -34,6 +34,15 @@ Open `/macro`, then drag `LL Circle`, `LL X`, `LL Diamond`, `LL T`, `LL Triangle
 
 The macro channel can be changed in the settings panel or with `/ll channel raid`, `/ll channel instance`, or `/ll channel party`. Use **Create / Update Macros** in settings, or re-run `/ll macros`, after changing channel or strategy so the account-wide macros are updated.
 
+If encounter transport is blocked, use the local fallback on the caller only:
+
+```text
+/ll strategy local
+/ll macros
+```
+
+This updates the `LL Circle`, `LL X`, `LL Diamond`, `LL T`, `LL Triangle`, and `LL Undo` macros to render directly on the caller's own viewer with no chat or ping transport.
+
 ## Testing
 
 Use **Run Demo** in settings or `/ll demo` for a local viewer test. It fills the current mode's slots without sending any group message.
@@ -49,6 +58,10 @@ For an out-of-combat group transport test, make the caller the group leader or a
 Listening clients only accept group test messages from the group leader or a raid assistant. `/ll send` is a testing fallback, not the intended in-encounter path.
 
 For the ping strategy, every addon user must select `/ll strategy ping`, then the caller must run `/ll macros` again. Ping macros ignore `/ll channel`. Use `/ll pinglog` and `/ll pinglog clear` while testing ping payloads.
+
+For the local-only strategy, only the caller needs to select `/ll strategy local`, then run `/ll macros` again. Local macros ignore `/ll channel` and do not send anything to other clients.
+
+For the debug strategy, every addon user should select `/ll strategy debug`, then the caller should run `/ll macros` again. Debug macros send both the configured chat payload and a ping, and listeners accept either transport. If both transports arrive, duplicate symbols may appear.
 
 ## Local Deploy
 
@@ -71,7 +84,7 @@ Use `.\scripts\Deploy-Local.ps1 -Plan` to preview the files, or `.\scripts\Deplo
 - `/ll` toggles the viewer.
 - `/ll lock` locks the viewer.
 - `/ll unlock` unlocks the viewer for dragging.
-- `/ll test` toggles strategy event listening outside the target encounter, except in unrelated instances.
+- `/ll test` is currently a legacy test toggle; strategy event listening is temporarily always on while encounter filtering is disabled for diagnosis.
 - `/ll demo` loads a local solo demo sequence.
 - `/ll add circle|x|diamond|t|triangle` adds one local test rune.
 - `/ll send circle|x|diamond|t|triangle` sends one out-of-combat group test signal when the selected strategy supports it.
@@ -115,7 +128,7 @@ During the encounter, authorized group chat from the caller can be interpreted a
 
 ## Implementation Approach
 
-The addon listens only while the L'ura encounter is active in the target raid, or while `/ll test` is enabled outside unrelated instances. Outside those states, strategy-specific events are unregistered.
+Temporary diagnostic build: encounter filtering is disabled, so the selected strategy's events stay registered without requiring the L'ura encounter detector to fire. Sender authorization still applies before any symbol is rendered.
 
 Incoming signals are accepted only from the current group leader or a raid assistant, using public group roster information. The addon does not rely on combat-log solving, private aura scanning, addon-message sync, automatic assignment, target markers, movement, casting, or secret-value decoding.
 
@@ -143,5 +156,9 @@ Strategies return render values instead of drawing directly:
 `UI.lua` is the only layer that turns those values into visible textures. This keeps transmission details out of the viewer and lets future strategies reuse the same display path.
 
 The default `texture` strategy preserves the Midnight-safe direct payload flow: authorized group chat is passed directly into `FontString:SetFormattedText("|T%s:44:44|t", payload)` without parsing, comparing, concatenating, or translating the payload during the encounter.
+
+The `local` strategy is a transport-free fallback: caller macros run `/ll add <rune>` and `/ll undo` locally, so only the caller's own viewer updates.
+
+The `debug` strategy combines the texture and ping transports for diagnosis. Generated macros contain both a chat line and a `/ping` line, and the strategy registers both event families.
 
 Future strategies should follow `docs/STRATEGIES.md` and must avoid combat-log data, Secret Value inspection, private aura scanning, in-combat addon comm sync, and gameplay automation.

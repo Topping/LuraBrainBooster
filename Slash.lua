@@ -11,7 +11,7 @@ function LL:PrintHelp()
     self:Print("/ll - toggle the viewer")
     self:Print("/ll lock - lock the viewer")
     self:Print("/ll unlock - unlock and drag the viewer")
-    self:Print("/ll test - listen outside the encounter while not in unrelated instances")
+    self:Print("/ll test - legacy test toggle; strategy listening is temporarily always on")
     self:Print("/ll demo - load a local solo demo sequence")
     self:Print("/ll add circle|cross|diamond|t|triangle - add one local test rune")
     self:Print("/ll send circle|x|diamond|t|triangle - test out-of-combat leader/assistant transport")
@@ -22,7 +22,9 @@ function LL:PrintHelp()
     self:Print("/ll channel raid|instance|party - set the direct macro channel")
     self:Print("/ll strategy - show the selected transmit strategy")
     self:Print("/ll strategy texture - set the direct texture-path strategy")
+    self:Print("/ll strategy local - set local-only caller macros")
     self:Print("/ll strategy ping - select the direct ping strategy")
+    self:Print("/ll strategy debug - send and listen with both chat and ping")
     self:Print("/ll pinglog - show recent ping diagnostics")
     self:Print("/ll pinglog clear - clear recent ping diagnostics")
     self:Print("/ll macros - create or update direct caller macros")
@@ -60,11 +62,7 @@ function LL:HandleSlash(message)
         self:SetLocked(false)
     elseif command == "test" or command == "listen" then
         self:SetTestListening(not self.db.testListen)
-        if self.db.testListen and self:IsInNonTargetInstance() then
-            self:Print("Test listening enabled, but paused in this unrelated instance.")
-        else
-            self:Print("Test listening " .. (self.db.testListen and "enabled." or "disabled."))
-        end
+        self:Print("Test listening setting " .. (self.db.testListen and "enabled" or "disabled") .. "; strategy listening is temporarily always on.")
     elseif command == "demo" then
         self:RunDemoSequence()
     elseif command == "add" or command == "rune" then

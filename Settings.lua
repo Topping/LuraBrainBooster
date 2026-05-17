@@ -12,7 +12,9 @@ local SETUP_DROPDOWN_WIDTH = 120
 
 local PLAYER_STRATEGY_DESCRIPTIONS = {
     texture = "Recommended. The caller presses the LL rune macros, and everyone sees the symbols appear in order.",
+    ["local"] = "Fallback. The caller's macros update only their own viewer, with no raid chat, pings, or transport.",
     ping = "Alternate setup. The caller uses ping macros instead of raid or party chat. Only use this if your group has tested it.",
+    debug = "Diagnostic. Caller macros send both chat and ping, and listeners accept either transport.",
 }
 
 local function AddText(parent, text, x, y, template)
@@ -328,7 +330,7 @@ function LL:CreateSettingsPanel()
     y = y - 42 - SECTION_GAP
 
     y = AddSection(content, "Testing", y)
-    controls.testListen = AddCheckbox(content, "Listen outside the encounter, except unrelated instances", LEFT, y, function(checked)
+    controls.testListen = AddCheckbox(content, "Legacy test toggle; listening is temporarily always on", LEFT, y, function(checked)
         LL:SetTestListening(checked)
     end)
     y = y - ROW
